@@ -32,7 +32,7 @@ class PaymentServiceImplTest {
 
     @Transactional
     @Test
-    void preAuth() {
+    void testPreAuth() {
         Payment savedPayment = this.paymentService.newPayment(payment);
 
         assertEquals(PaymentState.NEW, savedPayment.getState());
@@ -42,5 +42,27 @@ class PaymentServiceImplTest {
         Payment preAuthPayment = this.paymentRepository.getOne(savedPayment.getId());
         assertEquals(PaymentState.PRE_AUTH, preAuthPayment.getState());
         assertEquals(PaymentState.PRE_AUTH, sm.getState().getId());
+    }
+
+    @Transactional
+    @Test
+    void testAuth() {
+        Payment savedPayment = this.paymentService.newPayment(payment);
+
+        assertEquals(PaymentState.NEW, savedPayment.getState());
+
+        StateMachine<PaymentState, PaymentEvent> sm = this.paymentService.preAuth(savedPayment.getId());
+
+        Payment preAuthPayment = this.paymentRepository.getOne(savedPayment.getId());
+        assertEquals(PaymentState.PRE_AUTH, preAuthPayment.getState());
+        assertEquals(PaymentState.PRE_AUTH, sm.getState().getId());
+
+        StateMachine<PaymentState, PaymentEvent> sm2 = this.paymentService.authorizePayment(savedPayment.getId());
+
+        Payment authPayment = this.paymentRepository.getOne(savedPayment.getId());
+
+        assertEquals(PaymentState.AUTH, authPayment.getState());
+        assertEquals(PaymentState.AUTH, sm2.getState().getId());
+
     }
 }

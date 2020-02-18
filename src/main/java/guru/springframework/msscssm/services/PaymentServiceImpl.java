@@ -31,7 +31,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public StateMachine<PaymentState, PaymentEvent> preAuth(Long paymentId) {
         StateMachine<PaymentState, PaymentEvent> sm = build(paymentId);
-        this.sendEvent(paymentId, sm, PaymentEvent.PRE_AUTH_APPROVED);
+        this.sendEvent(paymentId, sm, PaymentEvent.PRE_AUTHORIZE);
         return sm;
     }
 
@@ -43,6 +43,8 @@ public class PaymentServiceImpl implements PaymentService {
         return sm;
     }
 
+    @Deprecated
+            //("State machine actions transit to this state when its required")
     @Transactional
     @Override
     public StateMachine<PaymentState, PaymentEvent> declineAuth(Long paymentId) {
