@@ -23,10 +23,10 @@ public class PaymentStateChangeInterceptor extends StateMachineInterceptorAdapte
     @Override
     public void preStateChange(State<PaymentState, PaymentEvent> state, Message<PaymentEvent> message, Transition<PaymentState, PaymentEvent> transition, StateMachine<PaymentState, PaymentEvent> stateMachine) {
         Optional.ofNullable(message).ifPresent( msg -> {
-            Optional.ofNullable(Long.class.cast(msg.getHeaders().getOrDefault(PaymentServiceImpl.PAYMENT_ID_HEADER. -1L)))
+            Optional.ofNullable(Long.class.cast(msg.getHeaders().getOrDefault(PaymentServiceImpl.PAYMENT_ID_HEADER, -1L)))
                     .ifPresent(paymentId -> {
                         Payment payment = this.paymentRepository.getOne(paymentId);
-                        payment.setState(state);
+                        payment.setState(state.getId());
                         this.paymentRepository.save(payment);
                     });
         });
